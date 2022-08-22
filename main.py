@@ -21,14 +21,6 @@ edge_list = np.asarray(
     ],
     dtype=int
 )
-edge_list = np.asarray(
-    [
-        [0, 1],
-        [1, 2],
-        [0, 2],
-    ],
-    dtype=int
-)
 
 # Compute the adjacency matrix.
 #
@@ -57,9 +49,15 @@ edges_powerset = {frozenset(es) for es in edges_powerset}
 independents = {
     es for es in edges_powerset
     if len(es) == 0
-    or np.linalg.matrix_rank(adjacency_matrix[np.ix_((0, 1), tuple(es))])
+    or np.linalg.matrix_rank(
+        adjacency_matrix[np.ix_(range(n_vertices), tuple(es))]
+    )
     == len(es)
 }
+print(
+    f'independents ='
+    f'{sorted(tuple(sorted(independent)) for independent in independents)}\n'
+)
 dependents = edges_powerset.difference(independents)
 circuits = {
     es for es in dependents
@@ -71,10 +69,11 @@ circuits = {
 # Sort two layers deep (sort each circuit, and sort circuits).
 circuits = sorted(tuple(sorted(circuit)) for circuit in circuits)
 n_circuits = len(circuits)
-print(f'{circuits = }')
+print(f'{circuits = }\n')
 
 
 def boundary(edge_as_list):
+    # TODO: Check if this can be replaced with a columns of adjacency_matrix.
     u, v = edge_as_list
     boundary = np.zeros((n_edges, 1), dtype=int)
     boundary[u, 0] = -1
