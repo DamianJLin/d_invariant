@@ -1,14 +1,17 @@
 import sympy as sp
 import networkx as nx
+import typing
 import itertools
 
 # Set up printing.
 sp.init_printing()
 old_print = print
+pprint_type = sp.MatrixBase | typing.List | typing.Tuple | typing.Set |\
+    typing.Dict
 
 
 def my_print(obj):
-    if isinstance(obj, sp.matrices.Matrix):
+    if isinstance(obj, pprint_type):
         sp.pprint(obj)
     else:
         old_print(obj)
@@ -76,3 +79,37 @@ def dual_basis_matrix(basis_matrix):
 fdual_basis_matrix = dual_basis_matrix(flow_basis_matrix)
 print('dual of flow lattice basis matrix:')
 print(fdual_basis_matrix)
+
+
+# Calculate the short vectors of the lattice of integer flows via the
+# surjection from the short vectors of the unimdoular lattice.
+short_unimod = map(
+    lambda coeffs: sp.matrices.Matrix(coeffs),
+    itertools.product([1, -1], repeat=n_edges)
+)
+short_flow = map(
+    lambda v: fdual_basis_matrix.H * v,
+    short_unimod
+)
+distinct_short_flow = set()
+for v in short_flow:
+    v = sp.matrices.ImmutableMatrix(v)
+    # Check v not in same equiv. class as any other vector u so far by checking
+    # coefficients of (u - v).
+    if not any(all(c % 2 == 0 for c in (v - u)) for u in distinct_short_flow):
+        distinct_short_flow.add(v)
+print("short vectors (mod 2 " + "\U0001D509" + "(G)):")
+sp.pprint(set(distinct_short_flow))
+
+
+# Calculate the d-invariant of the graph.
+flow_rank = flow_basis_matrix.rank()
+# In the flow basis, the new inner product matrix is given by:
+flow_gram_matrix = flow_basis_matrix.H * flow_basis_matrix
+d_map = {
+    x:
+    (sp.MatrixBase.dot(x.H * flow_gram_matrix, x) - flow_rank) / 4
+    for x in distinct_short_flow
+}
+
+print(d_map)
