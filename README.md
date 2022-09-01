@@ -6,12 +6,12 @@ Name of a .csv file. Each row should look like `u,v` representing an edge coming
 
 # Usage
 
-> Compute d-invariant of a single graph:
+- Compute d-invariant of a single graph:
 
 `python main.py example_graph_1.csv`
-> Compute the d-invariant of multiple graphs:
+- Compute the d-invariant of multiple graphs:
 
 `python main.py example_graph_1.csv example_graph_2.csv`
-> Compute the d-invariant of many graphs with similar name:
+- Compute the d-invariant of many graphs with similar name:
 
 `python main.py example_graph_*.csv`
