@@ -64,13 +64,15 @@ def compute_d_invariant(edge_list):
         lambda v: fdual_basis_matrix.H * v,
         short_unimod
     )
+    short_flow = list(short_flow)
+    print(short_flow)
     distinct_short_flow = set()
     for v in short_flow:
         v = sp.matrices.ImmutableMatrix(v)
         # Check v not in same equiv. class as any other vector u so far by
         # checking coefficients of (u - v).
         if not any(
-                all(c % 2 == 0 for c in (v - u)) for u in distinct_short_flow
+            all(c % 2 == 0 for c in (v - u)) for u in distinct_short_flow
         ):
             distinct_short_flow.add(v)
 
@@ -83,7 +85,15 @@ def compute_d_invariant(edge_list):
         (sp.MatrixBase.dot(x.H * flow_gram_matrix, x) - flow_rank) / 4
         for x in distinct_short_flow
     }
-    return set(distinct_short_flow), d_map
+
+    edge_basis_distinct_short_flow = map(
+        lambda v: flow_basis_matrix * v,
+        distinct_short_flow
+    )
+    edge_basis_d_map = {
+        flow_basis_matrix * v: q for (v, q) in d_map.items()
+    }
+    return set(edge_basis_distinct_short_flow), dict(edge_basis_d_map)
 
 
 if __name__ == '__main__':
