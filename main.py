@@ -65,7 +65,6 @@ def compute_d_invariant(edge_list):
         short_unimod
     )
     short_flow = list(short_flow)
-    print(short_flow)
     distinct_short_flow = set()
     for v in short_flow:
         v = sp.matrices.ImmutableMatrix(v)
