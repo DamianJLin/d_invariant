@@ -9,6 +9,9 @@ Name of a .csv file. Each row should look like `u,v` representing an edge coming
 - Compute d-invariant of a single graph:
 
 `python main.py example_graph_1.csv`
+- Compute d-invariant of a single graph and print:
+
+`python main.py example_graph_1.csv -v`
 - Compute the d-invariant of multiple graphs:
 
 `python main.py example_graph_1.csv example_graph_2.csv`
