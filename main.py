@@ -2,7 +2,7 @@ import sys
 import csv
 import pathlib
 import sympy as sp
-import lib
+import lib.dinv as dinv
 
 
 if __name__ == '__main__':
@@ -46,7 +46,7 @@ if __name__ == '__main__':
                 raise ValueError("graph.csv must not be an empty file.")
 
             edge_list = sp.matrices.Matrix(edge_list)
-            chi, d = lib.compute_d_invariant(edge_list)
+            chi, d = dinv.compute_d_invariant(edge_list)
 
             # TODO: Write to file.
 
