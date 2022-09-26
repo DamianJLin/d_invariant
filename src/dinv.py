@@ -4,6 +4,12 @@ import itertools
 
 
 def compute_d_invariant(edge_list):
+    """
+    Compute d-invariant from tuple or list representing edge list. Elements of
+    the collection should be 2-element lists.
+    """
+
+    edge_list = sp.Matrix(edge_list)
 
     n_edges = edge_list.shape[0]
     n_vertices = max(sp.utilities.iterables.flatten(edge_list)) + 1

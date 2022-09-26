@@ -113,7 +113,6 @@ class ChordDiagram():
                         v = v.jump
                         # Update alignment.
                         a = a * turn * v.height * v.writhe
-            print(edge_dict)
             assert all(len(faces) == 2 for faces in edge_dict.values())
             graphs.append(tuple(edge_dict.values()))
 

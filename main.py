@@ -1,9 +1,9 @@
 import sys
-import csv
 import pathlib
 import sympy as sp
-import lib.dinv as dinv
-
+import src.dinv as dinv
+import src.tait as tait
+import progress.bar as prog
 
 if __name__ == '__main__':
     sp.init_printing()
@@ -20,42 +20,47 @@ if __name__ == '__main__':
             args_no_flags.append(arg)
     args = args_no_flags
 
-    if not args:
-        raise ValueError("Argument(s) missing: edge list .csv file.")
+    if not len(args) == 1:
+        raise ValueError("Invalid arguments.")
+    input_relpath = args[0]
 
     # Set up filepath.
     parent_path = pathlib.Path(__file__).parent
-    graph_paths = [parent_path / fname for fname in args]
+    input_path = parent_path / input_relpath
+    output_path = parent_path / 'out'
 
-    # Compute d-invariant(s).
-    for i, graph_path in enumerate(graph_paths):
-        if not graph_path.is_file():
-            raise FileNotFoundError(f"{graph_path} not found.")
+    # Clear files in output_path.
+    for f in output_path.glob('*'):
+        f.unlink()
 
-        # Take edge list as input from graph.csv.
-        with open(graph_path) as csvfile:
-            reader = csv.reader(csvfile)
-            edge_list = []
-            for row in reader:
-                if len(row) != 2:
-                    raise ValueError("graph.csv must have row length 2.")
-                if not all(entry.strip().isdigit() for entry in row):
-                    raise ValueError("graph.csv entries must be integers.")
-                edge_list.append([int(entry.strip()) for entry in row])
-            if not edge_list:
-                raise ValueError("graph.csv must not be an empty file.")
+    # Set up progress bar.
+    n_input = sum(1 for line in open(input_path))
+    bar = prog.IncrementalBar(
+        'Computing d-invariants:',
+        max=n_input,
+        color='green',
+    )
 
-            edge_list = sp.matrices.Matrix(edge_list)
-            chi, d = dinv.compute_d_invariant(edge_list)
+    with open(input_path, 'r') as file_in:
+        for line in file_in:
+            data = line.rstrip().split(' ')
+            name, gauss_code = data
+            tnorm, tdual = tait.tait_graph_edge_lists(gauss_code)
+            tnorm_dinv = dinv.compute_d_invariant(tnorm)
+            tdual_dinv = dinv.compute_d_invariant(tdual)
 
-            # TODO: Write to file.
+            tait_graphs_path = output_path / f'{name}.tait'
+            with open(tait_graphs_path, 'w') as file_out:
+                for edge in tnorm:
+                    file_out.write(str(edge) + '\n')
+                file_out.write('\n')
+                for edge in tdual:
+                    file_out.write(str(edge) + '\n')
 
-            # Printing.
-            if verbose:
-                sp.pprint(f'd-invariant for graph in {graph_path.name}')
-                sp.pprint("short vectors (mod 2 " + "\U0001D509" + "(G)):")
-                sp.pprint(chi)
-                sp.pprint('d mapping:')
-                sp.pprint(d)
-                if not i == len(args) - 1:
-                    print('')
+            dinv_path = output_path / f'{name}.dinv'
+            with open(dinv_path, 'w') as file_out:
+                file_out.write(sp.pretty((tnorm_dinv[1])))
+                file_out.write('\n\n')
+                file_out.write(sp.pretty((tdual_dinv[1])))
+            bar.next()
+        bar.finish()
