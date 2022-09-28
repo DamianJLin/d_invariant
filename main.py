@@ -1,6 +1,7 @@
 import sys
 import pathlib
 import sympy as sp
+import pickle
 import src.dinv as dinv
 import src.tait as tait
 import progress.bar as prog
@@ -62,5 +63,14 @@ if __name__ == '__main__':
                 file_out.write(sp.pretty((tnorm_dinv[1])))
                 file_out.write('\n\n')
                 file_out.write(sp.pretty((tdual_dinv[1])))
+
+            dinv_pickle_path = output_path / f'{name}.dinv.pickle'
+            with open(dinv_pickle_path, 'w') as file_out:
+                pickle.dump(
+                    (tnorm_dinv, tdual_dinv),
+                    file_out,
+                    protocol=pickle.HIGHEST_PROTOCOL
+                )
+
             bar.next()
         bar.finish()
