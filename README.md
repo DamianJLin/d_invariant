@@ -44,4 +44,4 @@ Pickled tuple of the two maps above.
 The following python packages:
 - `networkx v2.6.3`
 - `progress v1.6`
-- `sympy v1.11`:
+- `sympy v1.11`
