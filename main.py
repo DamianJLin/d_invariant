@@ -65,7 +65,7 @@ if __name__ == '__main__':
                 file_out.write(sp.pretty((tdual_dinv[1])))
 
             dinv_pickle_path = output_path / f'{name}.dinv.pickle'
-            with open(dinv_pickle_path, 'w') as file_out:
+            with open(dinv_pickle_path, 'wb') as file_out:
                 pickle.dump(
                     (tnorm_dinv, tdual_dinv),
                     file_out,
