@@ -1,3 +1,0 @@
-networkx==2.6.3
-progress==1.6
-sympy==1.11
